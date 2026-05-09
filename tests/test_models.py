@@ -1,21 +1,33 @@
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
 import pytest
 
 from enrich_csv.models import VALID_CATEGORIES, Transaction, TransactionType
 
 
-def make_transaction(**kwargs):
-    defaults = {
-        "date": date(2026, 1, 15),
-        "raw_label": "PRLV OPERATEUR MOBILE",
-        "clean_label": "OPERATEUR MOBILE",
-        "amount": Decimal("9.99"),
-        "type": TransactionType.EXPENSE,
-        "source_account": "CMB Perso",
-    }
-    return Transaction(**{**defaults, **kwargs})
+def make_transaction(
+    *,
+    date: date = date(2026, 1, 15),
+    raw_label: str = "PRLV OPERATEUR MOBILE",
+    clean_label: str = "OPERATEUR MOBILE",
+    amount: Decimal = Decimal("9.99"),
+    type: TransactionType = TransactionType.EXPENSE,
+    source_account: str = "CMB Perso",
+    merchant_name: str = "",
+    category: str = "",
+) -> Transaction:
+    return Transaction(
+        date=date,
+        raw_label=raw_label,
+        clean_label=clean_label,
+        amount=amount,
+        type=type,
+        source_account=source_account,
+        merchant_name=merchant_name,
+        category=category,
+    )
 
 
 def test_valid_transaction():
@@ -55,18 +67,21 @@ def test_amount_zero_allowed():
 
 
 def test_amount_wrong_type_raises():
+    bad: Any = 9.99
     with pytest.raises((ValueError, TypeError)):
-        make_transaction(amount=9.99)
+        make_transaction(amount=bad)
 
 
 def test_type_string_raises():
+    bad: Any = "Dépense"
     with pytest.raises(TypeError, match="TransactionType"):
-        make_transaction(type="Dépense")
+        make_transaction(type=bad)
 
 
 def test_date_string_raises():
+    bad: Any = "2026-01-15"
     with pytest.raises(TypeError, match="datetime.date"):
-        make_transaction(date="2026-01-15")
+        make_transaction(date=bad)
 
 
 def test_source_account_empty_raises():

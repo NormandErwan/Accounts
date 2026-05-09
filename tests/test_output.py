@@ -18,18 +18,27 @@ EXPECTED_HEADERS = [
 ]
 
 
-def make_transaction(**kwargs) -> Transaction:
-    defaults = {
-        "date": date(2026, 1, 15),
-        "raw_label": "PRLV OPERATEUR MOBILE",
-        "clean_label": "OPERATEUR MOBILE",
-        "amount": Decimal("9.99"),
-        "type": TransactionType.EXPENSE,
-        "source_account": "CMB Perso",
-        "merchant_name": "Opérateur Mobile",
-        "category": "Abonnements",
-    }
-    return Transaction(**{**defaults, **kwargs})
+def make_transaction(
+    *,
+    date: date = date(2026, 1, 15),
+    raw_label: str = "PRLV OPERATEUR MOBILE",
+    clean_label: str = "OPERATEUR MOBILE",
+    amount: Decimal = Decimal("9.99"),
+    type: TransactionType = TransactionType.EXPENSE,
+    source_account: str = "CMB Perso",
+    merchant_name: str = "Opérateur Mobile",
+    category: str = "Abonnements",
+) -> Transaction:
+    return Transaction(
+        date=date,
+        raw_label=raw_label,
+        clean_label=clean_label,
+        amount=amount,
+        type=type,
+        source_account=source_account,
+        merchant_name=merchant_name,
+        category=category,
+    )
 
 
 def parse_csv(text: str) -> list[dict[str, str]]:
