@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff
+      - run: ruff check enrich_csv/ tests/
+      - run: ruff format --check enrich_csv/ tests/
+
+  type-check:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt mypy
+      - run: mypy enrich_csv/ --strict
+
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-dev.txt
+      - run: pytest tests/ -m "not e2e" --cov=enrich_csv --cov-report=xml -v
+      - uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: coverage.xml
+        continue-on-error: true
+
+  e2e-tests:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    # Only run when secrets are available (push to main branch or manual trigger)
+    if: >
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/claude/enrich-bank-csv-GB7tM')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-dev.txt
+      - name: Run e2e tests
+        env:
+          E2E_CMB_PERSO_CSV: ${{ secrets.E2E_CMB_PERSO_CSV }}
+          E2E_CMB_COMMUN_CSV: ${{ secrets.E2E_CMB_COMMUN_CSV }}
+          E2E_FORTUNEO_ZIP: ${{ secrets.E2E_FORTUNEO_ZIP }}
+        run: pytest tests/e2e/ -m e2e -v
+
+  security:
+    name: Security audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt
