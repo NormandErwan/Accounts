@@ -1,7 +1,7 @@
 import csv
 import io
 
-from enrich_csv.models import FIREFLY_TYPE_MAP, Transaction
+from enrich_csv.models import FIREFLY_TYPE_MAP, Transaction, TransactionType
 
 _HEADERS = [
     "date",
@@ -22,7 +22,7 @@ def to_firefly_csv(transactions: list[Transaction]) -> str:
     writer.writeheader()
     for tx in transactions:
         firefly_type = FIREFLY_TYPE_MAP[tx.type]
-        destination = tx.merchant_name if tx.type.value == "Dépense" else ""
+        destination = tx.merchant_name if tx.type == TransactionType.EXPENSE else ""
         writer.writerow(
             {
                 "date": tx.date.isoformat(),

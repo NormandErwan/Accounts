@@ -98,7 +98,7 @@ def parse_fortuneo(path: Path, account: str) -> list[Transaction]:
             Transaction(
                 date=tx_date,
                 raw_label=label,
-                clean_label=label,
+                clean_label=normalize_label(label),
                 amount=amount,
                 type=tx_type,
                 source_account=account,

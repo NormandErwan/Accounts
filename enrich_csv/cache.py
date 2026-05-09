@@ -10,7 +10,7 @@ def load_cache(path: Path) -> Cache:
     if not path.exists():
         return {}
     data: Any = json.loads(path.read_text(encoding="utf-8"))
-    return data  # type: ignore[no-any-return]
+    return data
 
 
 def lookup(cache: Cache, key: str) -> dict[str, str] | None:
