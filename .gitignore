@@ -11,3 +11,5 @@ htmlcov/
 cache.json
 *.csv
 *.zip
+!tests/fixtures/*.csv
+!tests/fixtures/*.zip
