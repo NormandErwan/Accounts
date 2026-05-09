@@ -26,9 +26,8 @@ def _decode_secret(env_var: str) -> Path | None:
     if not value:
         return None
     suffix = ".zip" if "ZIP" in env_var else ".csv"
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
-    tmp.write(base64.b64decode(value))
-    tmp.close()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(base64.b64decode(value))
     return Path(tmp.name)
 
 

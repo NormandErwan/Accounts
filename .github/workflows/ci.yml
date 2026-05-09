@@ -7,71 +7,59 @@ on:
 
 jobs:
   lint:
-    name: Lint
+    name: Lint & format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install ruff
-      - run: ruff check enrich_csv/ tests/
-      - run: ruff format --check enrich_csv/ tests/
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
 
   type-check:
     name: Type check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt mypy
-      - run: python -m mypy enrich_csv/ --strict
+      - uses: astral-sh/setup-uv@v6
+      - run: uvx ty check .
 
   unit-tests:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements-dev.txt
-      - run: pytest tests/ -m "not e2e" --cov=enrich_csv --cov-report=xml -v
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --dev
+      - run: uv run pytest tests/ -m "not e2e" --cov=enrich_csv --cov-report=xml -v
       - uses: codecov/codecov-action@v4
         if: always()
         with:
           files: coverage.xml
         continue-on-error: true
 
-  e2e-tests:
-    name: End-to-end tests
-    runs-on: ubuntu-latest
-    # Only run when secrets are available (push to main branch or manual trigger)
-    if: >
-      github.event_name == 'push' &&
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/claude/enrich-bank-csv-GB7tM')
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements-dev.txt
-      - name: Run e2e tests
-        env:
-          E2E_CMB_PERSO_CSV: ${{ secrets.E2E_CMB_PERSO_CSV }}
-          E2E_CMB_COMMUN_CSV: ${{ secrets.E2E_CMB_COMMUN_CSV }}
-          E2E_FORTUNEO_ZIP: ${{ secrets.E2E_FORTUNEO_ZIP }}
-        run: pytest tests/e2e/ -m e2e -v
-
   security:
     name: Security audit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install pip-audit
-      - run: pip-audit -r requirements.txt
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --dev
+      - run: uv run pip-audit
+
+  e2e-tests:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/claude/enrich-bank-csv-GB7tM')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --dev
+      - name: Run e2e tests
+        env:
+          E2E_CMB_PERSO_CSV: ${{ secrets.E2E_CMB_PERSO_CSV }}
+          E2E_CMB_COMMUN_CSV: ${{ secrets.E2E_CMB_COMMUN_CSV }}
+          E2E_FORTUNEO_ZIP: ${{ secrets.E2E_FORTUNEO_ZIP }}
+        run: uv run pytest tests/e2e/ -m e2e -v

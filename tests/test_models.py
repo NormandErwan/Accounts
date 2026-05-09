@@ -80,7 +80,7 @@ def test_type_string_raises():
 
 def test_date_string_raises():
     bad: Any = "2026-01-15"
-    with pytest.raises(TypeError, match="datetime.date"):
+    with pytest.raises(TypeError, match=r"datetime\.date"):
         make_transaction(date=bad)
 
 

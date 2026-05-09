@@ -1,3 +1,4 @@
+import contextlib
 import locale
 from pathlib import Path
 
@@ -13,10 +14,8 @@ from enrich_csv.normalizer import cache_key, simplify_name
 _CATEGORIES = sorted(VALID_CATEGORIES)
 _console = Console()
 
-try:
+with contextlib.suppress(locale.Error):
     locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
-except locale.Error:
-    pass  # fall back to default locale on systems without fr_FR
 
 
 def _format_date(tx: Transaction) -> str:

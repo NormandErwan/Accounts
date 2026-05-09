@@ -111,7 +111,7 @@ class TestParseFortuneoFromZip:
         from_csv = parse_fortuneo(FIXTURES / "fortuneo_sample.csv", account="Fortuneo")
         from_zip = parse_fortuneo(FIXTURES / "fortuneo_sample.zip", account="Fortuneo")
         assert len(from_zip) == len(from_csv)
-        for a, b in zip(from_zip, from_csv):
+        for a, b in zip(from_zip, from_csv, strict=True):
             assert a.date == b.date
             assert a.raw_label == b.raw_label
             assert a.amount == b.amount

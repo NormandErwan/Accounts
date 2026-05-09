@@ -1,6 +1,0 @@
--r requirements.txt
-pytest>=8.0
-pytest-cov
-ruff
-mypy
-pip-audit

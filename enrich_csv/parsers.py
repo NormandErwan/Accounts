@@ -12,7 +12,7 @@ _TRANSFER_KEYWORDS = ("vers ", "WERO", "COMPTE COMMUN")
 
 
 def _parse_french_decimal(value: str) -> Decimal:
-    cleaned = value.strip().replace(" ", "").replace(" ", "").replace(",", ".")
+    cleaned = value.strip().replace("\u00a0", "").replace(" ", "").replace(",", ".")
     return Decimal(cleaned)
 
 
