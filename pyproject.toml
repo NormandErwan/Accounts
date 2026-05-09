@@ -27,3 +27,11 @@ select = ["E", "F", "I", "UP"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+
+[[tool.mypy.overrides]]
+module = ["click", "rich.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["enrich_csv.cli"]
+disallow_untyped_decorators = false

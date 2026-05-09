@@ -2,8 +2,6 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-import pytest
-
 from enrich_csv.models import TransactionType
 from enrich_csv.parsers import parse_cmb, parse_fortuneo
 

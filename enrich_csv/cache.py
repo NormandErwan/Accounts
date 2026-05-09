@@ -1,21 +1,25 @@
 import json
 from pathlib import Path
+from typing import Any
+
+Cache = dict[str, dict[str, str]]
 
 
-def load_cache(path: Path) -> dict:
+def load_cache(path: Path) -> Cache:
     """Load the JSON cache from disk. Returns an empty dict if the file does not exist."""
     if not path.exists():
         return {}
-    return json.loads(path.read_text(encoding="utf-8"))
+    data: Any = json.loads(path.read_text(encoding="utf-8"))
+    return data  # type: ignore[no-any-return]
 
 
-def lookup(cache: dict, key: str) -> dict | None:
+def lookup(cache: Cache, key: str) -> dict[str, str] | None:
     """Return the cached entry for key, or None if absent."""
     return cache.get(key)
 
 
 def store(
-    cache: dict,
+    cache: Cache,
     key: str,
     *,
     merchant_name: str,
@@ -26,7 +30,7 @@ def store(
     cache[key] = {"merchant_name": merchant_name, "category": category, "siren": siren}
 
 
-def save_cache(cache: dict, path: Path) -> None:
+def save_cache(cache: Cache, path: Path) -> None:
     """Persist the cache to disk, creating parent directories if needed."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")

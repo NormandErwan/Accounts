@@ -3,7 +3,6 @@ import io
 
 from enrich_csv.models import FIREFLY_TYPE_MAP, Transaction
 
-
 _HEADERS = [
     "date",
     "description",

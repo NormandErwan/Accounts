@@ -12,7 +12,7 @@ _STRIP_PREFIXES: list[tuple[str, str]] = [
 ]
 
 _CLEAN_SUFFIXES: list[tuple[str, str]] = [
-    (r"\s+\d{5}\s+\S+$", ""),                                   # 35000 RENNES
+    (r"\s+\d{5}\s+\S+$", ""),  # 35000 RENNES
     # Title-case city word(s) only when immediately after an uppercase char (e.g. "SAS Roubaix")
     (r"(?<=[A-Z])\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*$", ""),
     # Bank reference codes: 8+ alphanum chars that contain at least one digit

@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt mypy
-      - run: mypy enrich_csv/ --strict
+      - run: python -m mypy enrich_csv/ --strict
 
   unit-tests:
     name: Unit tests

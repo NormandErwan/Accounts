@@ -4,7 +4,7 @@ _SEARCH_URL = "https://recherche-entreprises.api.gouv.fr/search"
 _TIMEOUT = 5.0
 
 
-def search_company(name: str) -> dict | None:
+def search_company(name: str) -> dict[str, str] | None:
     """Search the French SIRENE database for a company by name.
 
     Returns a dict with keys "name", "naf", "siren" on success, or None if not found

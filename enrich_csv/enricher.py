@@ -45,7 +45,9 @@ def _ask_category(proposed: str) -> str:
     return proposed
 
 
-def _display_transaction(tx: Transaction, api_result: dict | None, proposed_name: str) -> None:
+def _display_transaction(
+    tx: Transaction, api_result: dict[str, str] | None, proposed_name: str
+) -> None:
     table = Table(show_header=False, box=None, padding=(0, 1))
     table.add_column(style="dim", width=14)
     table.add_column()

@@ -2,7 +2,7 @@ import csv
 import io
 import zipfile
 from datetime import datetime
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from pathlib import Path
 
 from enrich_csv.models import Transaction, TransactionType

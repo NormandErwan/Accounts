@@ -3,8 +3,6 @@ import io
 from datetime import date
 from decimal import Decimal
 
-import pytest
-
 from enrich_csv.models import Transaction, TransactionType
 from enrich_csv.output import to_firefly_csv
 
