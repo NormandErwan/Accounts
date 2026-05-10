@@ -50,9 +50,6 @@ jobs:
   e2e-tests:
     name: End-to-end tests
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'push' &&
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/claude/enrich-bank-csv-GB7tM')
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6

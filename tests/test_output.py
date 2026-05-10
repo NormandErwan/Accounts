@@ -4,18 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from enrich_csv.models import Transaction, TransactionType
-from enrich_csv.output import to_firefly_csv
-
-EXPECTED_HEADERS = [
-    "date",
-    "description",
-    "amount",
-    "currency_code",
-    "source_name",
-    "destination_name",
-    "category",
-    "type",
-]
+from enrich_csv.output import _FireflyRow, to_firefly_csv
 
 
 def make_transaction(
@@ -48,8 +37,7 @@ def parse_csv(text: str) -> list[dict[str, str]]:
 def test_headers():
     result = to_firefly_csv([make_transaction()])
     reader = csv.reader(io.StringIO(result))
-    headers = next(reader)
-    assert headers == EXPECTED_HEADERS
+    assert next(reader) == list(_FireflyRow._fields)
 
 
 def test_expense_type_maps_to_withdrawal():

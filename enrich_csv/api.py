@@ -26,5 +26,5 @@ def search_company(name: str) -> dict[str, str] | None:
             "naf": hit.get("siege", {}).get("activite_principale", ""),
             "siren": hit.get("siren", ""),
         }
-    except Exception:
+    except (httpx.HTTPError, ValueError):
         return None

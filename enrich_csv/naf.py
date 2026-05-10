@@ -6,4 +6,7 @@ def naf_to_category(code: str, naf_map: dict[str, str]) -> str:
     """
     if not code:
         return "À classer"
-    return naf_map.get(code) or naf_map.get(code[:5]) or naf_map.get(code[:4]) or "À classer"
+    for key in (code, code[:5], code[:4]):
+        if (val := naf_map.get(key)) is not None:
+            return val
+    return "À classer"

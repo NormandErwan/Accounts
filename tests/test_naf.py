@@ -53,3 +53,9 @@ def test_naf_to_category_custom_map():
     custom = {"99.99": "Custom"}
     assert naf_to_category("99.99", custom) == "Custom"
     assert naf_to_category("47.11", custom) == "À classer"
+
+
+def test_naf_to_category_empty_string_value_does_not_fall_through():
+    """A code mapped to "" must return "" not fall through to "À classer"."""
+    naf_map = {"47.11": ""}
+    assert naf_to_category("47.11", naf_map) == ""

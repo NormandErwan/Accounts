@@ -36,9 +36,7 @@ def parse_cmb(path: Path, account: str) -> list[Transaction]:
             if raw_debit.strip():
                 amount = _parse_french_decimal(raw_debit)
                 tx_type = (
-                    TransactionType.TRANSFER
-                    if _detect_transfer(label)
-                    else TransactionType.EXPENSE
+                    TransactionType.TRANSFER if _detect_transfer(label) else TransactionType.EXPENSE
                 )
             else:
                 amount = _parse_french_decimal(raw_credit)
@@ -89,6 +87,8 @@ def parse_fortuneo(path: Path, account: str) -> list[Transaction]:
         debit_str = raw_debit.strip()
         credit_str = raw_credit.strip()
 
+        # Fortuneo exports don't use transfer-specific keywords; inter-account
+        # movements appear as regular debit/credit entries.
         if debit_str:
             amount = abs(_parse_french_decimal(debit_str))
             tx_type = TransactionType.EXPENSE

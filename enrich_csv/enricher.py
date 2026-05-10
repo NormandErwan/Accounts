@@ -1,5 +1,6 @@
 import contextlib
 import locale
+from dataclasses import replace
 from pathlib import Path
 
 from rich.console import Console
@@ -13,11 +14,25 @@ from enrich_csv.normalizer import destination_key, simplify_name
 
 _console = Console()
 
-with contextlib.suppress(locale.Error):
-    locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
+_TYPE_LABEL: dict[TransactionType, str] = {
+    TransactionType.EXPENSE: "Dépense",
+    TransactionType.INCOME: "Revenu",
+    TransactionType.TRANSFER: "Virement",
+}
+
+_locale_configured = False
+
+
+def _ensure_locale() -> None:
+    global _locale_configured
+    if not _locale_configured:
+        with contextlib.suppress(locale.Error):
+            locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
+        _locale_configured = True
 
 
 def _format_date(tx: Transaction) -> str:
+    _ensure_locale()
     return tx.date.strftime("%A %d %B %Y")
 
 
@@ -62,7 +77,7 @@ def _display_transaction(
     else:
         api_info = "[dim](aucun résultat SIRENE)[/dim]"
     table.add_row("API SIRENE", api_info)
-    _console.rule(f"[bold]{tx.type.value}[/bold] — {tx.source_name}")
+    _console.rule(f"[bold]{_TYPE_LABEL[tx.type]}[/bold] — {tx.source_name}")
     _console.print(table)
 
 
@@ -70,6 +85,7 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
     """Interactively enrich transactions with destination names and categories.
 
     Known transactions are enriched silently; unknown ones trigger an interactive prompt.
+    Returns new Transaction instances; input objects are never modified.
     """
     config = load_config(config_path)
     enriched: list[Transaction] = []
@@ -83,9 +99,9 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
         entry = lookup_destination(config, key)
 
         if entry:
-            tx.destination_name = entry["destination_name"]
-            tx.category = entry["category"]
-            enriched.append(tx)
+            enriched.append(
+                replace(tx, destination_name=entry["destination_name"], category=entry["category"])
+            )
             continue
 
         # Unknown transaction: query SIRENE and prompt user.
@@ -106,13 +122,12 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
         if category:
             if category not in config["categories"]:
                 config["categories"].append(category)
-            tx.destination_name = destination_name
-            tx.category = category
             store_destination(
                 config, key, destination_name=destination_name, category=category, siren=siren
             )
             save_config(config, config_path)
-
-        enriched.append(tx)
+            enriched.append(replace(tx, destination_name=destination_name, category=category))
+        else:
+            enriched.append(tx)
 
     return enriched
