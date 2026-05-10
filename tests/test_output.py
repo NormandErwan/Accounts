@@ -24,7 +24,7 @@ def make_transaction(
     raw_label: str = "PRLV OPERATEUR MOBILE",
     clean_label: str = "OPERATEUR MOBILE",
     amount: Decimal = Decimal("9.99"),
-    type: TransactionType = TransactionType.EXPENSE,
+    type: TransactionType = TransactionType.WITHDRAWAL,
     source_name: str = "CMB Perso",
     destination_name: str = "Opérateur Mobile",
     category: str = "Abonnements",
@@ -53,12 +53,12 @@ def test_headers():
 
 
 def test_expense_type_maps_to_withdrawal():
-    rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.EXPENSE)]))
+    rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.WITHDRAWAL)]))
     assert rows[0]["type"] == "withdrawal"
 
 
 def test_income_type_maps_to_deposit():
-    rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.INCOME)]))
+    rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.DEPOSIT)]))
     assert rows[0]["type"] == "deposit"
 
 
@@ -90,14 +90,14 @@ def test_source_name_is_account():
 def test_destination_name_for_expense():
     rows = parse_csv(
         to_firefly_csv(
-            [make_transaction(type=TransactionType.EXPENSE, destination_name="Carrefour")]
+            [make_transaction(type=TransactionType.WITHDRAWAL, destination_name="Carrefour")]
         )
     )
     assert rows[0]["destination_name"] == "Carrefour"
 
 
 def test_destination_name_empty_for_income():
-    rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.INCOME)]))
+    rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.DEPOSIT)]))
     assert rows[0]["destination_name"] == ""
 
 

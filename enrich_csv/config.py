@@ -2,22 +2,20 @@ import json
 from pathlib import Path
 from typing import TypedDict
 
-from enrich_csv.defaults import DEFAULT_CATEGORIES, DEFAULT_NAF_TO_CATEGORY
-
 
 class Config(TypedDict):
     categories: list[str]
     naf_to_category: dict[str, str]
-    merchant_cache: dict[str, dict[str, str]]
+    destination_cache: dict[str, dict[str, str]]
 
 
 def load_config(path: Path) -> Config:
-    """Load config from disk, filling missing keys with defaults."""
+    """Load config from disk, filling missing keys with empty defaults."""
     data: dict = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     return Config(
-        categories=data.get("categories", list(DEFAULT_CATEGORIES)),
-        naf_to_category=data.get("naf_to_category", dict(DEFAULT_NAF_TO_CATEGORY)),
-        merchant_cache=data.get("merchant_cache", {}),
+        categories=data.get("categories", []),
+        naf_to_category=data.get("naf_to_category", {}),
+        destination_cache=data.get("destination_cache", {}),
     )
 
 
@@ -34,12 +32,12 @@ def add_category(config: Config, name: str, path: Path) -> None:
         save_config(config, path)
 
 
-def lookup_merchant(config: Config, key: str) -> dict[str, str] | None:
-    """Return the cached merchant entry for key, or None if absent."""
-    return config["merchant_cache"].get(key)
+def lookup_destination(config: Config, key: str) -> dict[str, str] | None:
+    """Return the cached destination entry for key, or None if absent."""
+    return config["destination_cache"].get(key)
 
 
-def store_merchant(
+def store_destination(
     config: Config,
     key: str,
     *,
@@ -47,8 +45,8 @@ def store_merchant(
     category: str,
     siren: str = "",
 ) -> None:
-    """Insert or update a merchant entry in the in-memory config."""
-    config["merchant_cache"][key] = {
+    """Insert or update a destination entry in the in-memory config."""
+    config["destination_cache"][key] = {
         "destination_name": destination_name,
         "category": category,
         "siren": siren,

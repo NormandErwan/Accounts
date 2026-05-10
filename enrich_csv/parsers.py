@@ -36,11 +36,13 @@ def parse_cmb(path: Path, account: str) -> list[Transaction]:
             if raw_debit.strip():
                 amount = _parse_french_decimal(raw_debit)
                 tx_type = (
-                    TransactionType.TRANSFER if _detect_transfer(label) else TransactionType.EXPENSE
+                    TransactionType.TRANSFER
+                    if _detect_transfer(label)
+                    else TransactionType.WITHDRAWAL
                 )
             else:
                 amount = _parse_french_decimal(raw_credit)
-                tx_type = TransactionType.INCOME
+                tx_type = TransactionType.DEPOSIT
 
             transactions.append(
                 Transaction(
@@ -89,10 +91,10 @@ def parse_fortuneo(path: Path, account: str) -> list[Transaction]:
 
         if debit_str:
             amount = abs(_parse_french_decimal(debit_str))
-            tx_type = TransactionType.EXPENSE
+            tx_type = TransactionType.WITHDRAWAL
         else:
             amount = _parse_french_decimal(credit_str)
-            tx_type = TransactionType.INCOME
+            tx_type = TransactionType.DEPOSIT
 
         transactions.append(
             Transaction(

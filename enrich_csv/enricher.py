@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.table import Table
 
 from enrich_csv.api import search_company
-from enrich_csv.config import load_config, lookup_merchant, save_config, store_merchant
+from enrich_csv.config import load_config, lookup_destination, save_config, store_destination
 from enrich_csv.models import Transaction, TransactionType
 from enrich_csv.naf import naf_to_category
 from enrich_csv.normalizer import cache_key, simplify_name
@@ -81,7 +81,7 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
             continue
 
         key = cache_key(tx.raw_label)
-        cached = lookup_merchant(config, key)
+        cached = lookup_destination(config, key)
 
         if cached:
             tx.destination_name = cached["destination_name"]
@@ -109,7 +109,7 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
                 config["categories"].append(category)
             tx.destination_name = destination_name
             tx.category = category
-            store_merchant(
+            store_destination(
                 config, key, destination_name=destination_name, category=category, siren=siren
             )
             save_config(config, config_path)

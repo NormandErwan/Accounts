@@ -13,7 +13,7 @@ def make_transaction(
     raw_label: str = "PRLV OPERATEUR MOBILE",
     clean_label: str = "OPERATEUR MOBILE",
     amount: Decimal = Decimal("9.99"),
-    type: TransactionType = TransactionType.EXPENSE,
+    type: TransactionType = TransactionType.WITHDRAWAL,
     source_name: str = "CMB Perso",
     destination_name: str = "",
     category: str = "",
@@ -33,7 +33,7 @@ def make_transaction(
 def test_valid_transaction():
     tx = make_transaction()
     assert tx.amount == Decimal("9.99")
-    assert tx.type == TransactionType.EXPENSE
+    assert tx.type == TransactionType.WITHDRAWAL
     assert tx.destination_name == ""
     assert tx.category == ""
 
@@ -50,10 +50,10 @@ def test_all_transaction_types():
         assert tx.type == tx_type
 
 
-def test_transaction_type_french_values():
-    assert TransactionType.EXPENSE.value == "Dépense"
-    assert TransactionType.INCOME.value == "Revenu"
-    assert TransactionType.TRANSFER.value == "Virement"
+def test_transaction_type_firefly_values():
+    assert TransactionType.WITHDRAWAL.value == "withdrawal"
+    assert TransactionType.DEPOSIT.value == "deposit"
+    assert TransactionType.TRANSFER.value == "transfer"
 
 
 def test_amount_negative_raises():
@@ -73,7 +73,7 @@ def test_amount_wrong_type_raises():
 
 
 def test_type_string_raises():
-    bad: Any = "Dépense"
+    bad: Any = "withdrawal"
     with pytest.raises(TypeError, match="TransactionType"):
         make_transaction(type=bad)
 

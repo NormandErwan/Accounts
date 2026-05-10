@@ -5,16 +5,9 @@ from enum import Enum
 
 
 class TransactionType(Enum):
-    EXPENSE = "Dépense"
-    INCOME = "Revenu"
-    TRANSFER = "Virement"
-
-
-FIREFLY_TYPE_MAP: dict[TransactionType, str] = {
-    TransactionType.EXPENSE: "withdrawal",
-    TransactionType.INCOME: "deposit",
-    TransactionType.TRANSFER: "transfer",
-}
+    WITHDRAWAL = "withdrawal"
+    DEPOSIT = "deposit"
+    TRANSFER = "transfer"
 
 
 @dataclass

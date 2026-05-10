@@ -6,11 +6,10 @@ import pytest
 from enrich_csv.config import (
     add_category,
     load_config,
-    lookup_merchant,
+    lookup_destination,
     save_config,
-    store_merchant,
+    store_destination,
 )
-from enrich_csv.defaults import DEFAULT_CATEGORIES, DEFAULT_NAF_TO_CATEGORY
 
 
 @pytest.fixture
@@ -24,7 +23,7 @@ def populated_config_path(tmp_path: Path) -> Path:
     data = {
         "categories": ["Logement", "Courses"],
         "naf_to_category": {"47.11": "Courses"},
-        "merchant_cache": {
+        "destination_cache": {
             "OPERATEUR MOBILE": {
                 "destination_name": "Opérateur Mobile",
                 "category": "Abonnements",
@@ -36,18 +35,18 @@ def populated_config_path(tmp_path: Path) -> Path:
     return path
 
 
-def test_load_config_missing_file_returns_defaults(config_path: Path):
+def test_load_config_missing_file_returns_empty_defaults(config_path: Path):
     config = load_config(config_path)
-    assert config["categories"] == DEFAULT_CATEGORIES
-    assert config["naf_to_category"] == DEFAULT_NAF_TO_CATEGORY
-    assert config["merchant_cache"] == {}
+    assert config["categories"] == []
+    assert config["naf_to_category"] == {}
+    assert config["destination_cache"] == {}
 
 
 def test_load_config_existing_file_returns_custom_values(populated_config_path: Path):
     config = load_config(populated_config_path)
     assert config["categories"] == ["Logement", "Courses"]
     assert config["naf_to_category"] == {"47.11": "Courses"}
-    assert "OPERATEUR MOBILE" in config["merchant_cache"]
+    assert "OPERATEUR MOBILE" in config["destination_cache"]
 
 
 def test_save_config_creates_valid_json(config_path: Path):
@@ -56,16 +55,16 @@ def test_save_config_creates_valid_json(config_path: Path):
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     assert "categories" in raw
     assert "naf_to_category" in raw
-    assert "merchant_cache" in raw
+    assert "destination_cache" in raw
 
 
 def test_save_config_round_trips(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "TEST", destination_name="Test", category="Services")
+    store_destination(config, "TEST", destination_name="Test", category="Services")
     save_config(config, config_path)
     reloaded = load_config(config_path)
-    assert lookup_merchant(reloaded, "TEST") is not None
-    assert reloaded["merchant_cache"]["TEST"]["destination_name"] == "Test"
+    assert lookup_destination(reloaded, "TEST") is not None
+    assert reloaded["destination_cache"]["TEST"]["destination_name"] == "Test"
 
 
 def test_save_config_creates_parent_dirs(tmp_path: Path):
@@ -85,57 +84,55 @@ def test_add_category_appends_and_persists(config_path: Path):
 
 def test_add_category_no_duplicate(config_path: Path):
     config = load_config(config_path)
-    original_count = len(config["categories"])
-    add_category(config, config["categories"][0], config_path)
-    assert len(config["categories"]) == original_count
+    add_category(config, "Logement", config_path)
+    add_category(config, "Logement", config_path)
+    assert config["categories"].count("Logement") == 1
 
 
-def test_lookup_merchant_existing_key(populated_config_path: Path):
+def test_lookup_destination_existing_key(populated_config_path: Path):
     config = load_config(populated_config_path)
-    result = lookup_merchant(config, "OPERATEUR MOBILE")
+    result = lookup_destination(config, "OPERATEUR MOBILE")
     assert result is not None
     assert result["destination_name"] == "Opérateur Mobile"
     assert result["category"] == "Abonnements"
 
 
-def test_lookup_merchant_missing_key(populated_config_path: Path):
+def test_lookup_destination_missing_key(populated_config_path: Path):
     config = load_config(populated_config_path)
-    assert lookup_merchant(config, "UNKNOWN MERCHANT") is None
+    assert lookup_destination(config, "UNKNOWN") is None
 
 
-def test_lookup_merchant_case_sensitive(populated_config_path: Path):
+def test_lookup_destination_case_sensitive(populated_config_path: Path):
     config = load_config(populated_config_path)
-    assert lookup_merchant(config, "operateur mobile") is None
+    assert lookup_destination(config, "operateur mobile") is None
 
 
-def test_store_merchant_adds_entry(config_path: Path):
+def test_store_destination_adds_entry(config_path: Path):
     config = load_config(config_path)
-    store_merchant(
-        config, "NOUVEAU MARCHAND", destination_name="Nouveau Marchand", category="Achats"
-    )
-    assert "NOUVEAU MARCHAND" in config["merchant_cache"]
-    assert config["merchant_cache"]["NOUVEAU MARCHAND"]["destination_name"] == "Nouveau Marchand"
-    assert config["merchant_cache"]["NOUVEAU MARCHAND"]["category"] == "Achats"
+    store_destination(config, "NOUVEAU", destination_name="Nouveau", category="Achats")
+    assert "NOUVEAU" in config["destination_cache"]
+    assert config["destination_cache"]["NOUVEAU"]["destination_name"] == "Nouveau"
+    assert config["destination_cache"]["NOUVEAU"]["category"] == "Achats"
 
 
-def test_store_merchant_with_siren(config_path: Path):
+def test_store_destination_with_siren(config_path: Path):
     config = load_config(config_path)
-    store_merchant(
+    store_destination(
         config, "MARCHAND", destination_name="Marchand", category="Achats", siren="987654321"
     )
-    assert config["merchant_cache"]["MARCHAND"]["siren"] == "987654321"
+    assert config["destination_cache"]["MARCHAND"]["siren"] == "987654321"
 
 
-def test_store_merchant_without_siren_defaults_empty(config_path: Path):
+def test_store_destination_without_siren_defaults_empty(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "MARCHAND", destination_name="Marchand", category="Achats")
-    assert config["merchant_cache"]["MARCHAND"]["siren"] == ""
+    store_destination(config, "MARCHAND", destination_name="Marchand", category="Achats")
+    assert config["destination_cache"]["MARCHAND"]["siren"] == ""
 
 
 def test_saved_file_preserves_non_ascii(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "TEST", destination_name="Tëst café", category="Loisirs")
+    store_destination(config, "TEST", destination_name="Tëst café", category="Loisirs")
     save_config(config, config_path)
     raw = config_path.read_text(encoding="utf-8")
     parsed = json.loads(raw)
-    assert parsed["merchant_cache"]["TEST"]["destination_name"] == "Tëst café"
+    assert parsed["destination_cache"]["TEST"]["destination_name"] == "Tëst café"

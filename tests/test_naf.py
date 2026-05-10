@@ -1,9 +1,23 @@
 import pytest
 
-from enrich_csv.defaults import DEFAULT_NAF_TO_CATEGORY
 from enrich_csv.naf import naf_to_category
 
-_NAF_MAP = DEFAULT_NAF_TO_CATEGORY
+_NAF_MAP = {
+    "47.11": "Courses",
+    "47.73": "Santé",
+    "86.21": "Santé",
+    "49.41": "Transport",
+    "52.21": "Transport",
+    "56.10": "Loisirs",
+    "56.30": "Loisirs",
+    "61.20": "Abonnements",
+    "62.01": "Services",
+    "47.52": "Maison",
+    "68.20": "Logement",
+    "47.91": "Achats",
+    "84.11": "Impôts",
+    "65.30": "Épargne",
+}
 
 
 @pytest.mark.parametrize(
