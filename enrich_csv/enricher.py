@@ -6,12 +6,11 @@ from rich.console import Console
 from rich.table import Table
 
 from enrich_csv.api import search_company
-from enrich_csv.cache import load_cache, lookup, save_cache, store
-from enrich_csv.models import VALID_CATEGORIES, Transaction, TransactionType
+from enrich_csv.config import load_config, lookup_merchant, save_config, store_merchant
+from enrich_csv.models import Transaction, TransactionType
 from enrich_csv.naf import naf_to_category
 from enrich_csv.normalizer import cache_key, simplify_name
 
-_CATEGORIES = sorted(VALID_CATEGORIES)
 _console = Console()
 
 with contextlib.suppress(locale.Error):
@@ -28,20 +27,25 @@ def _ask_merchant_name(proposed: str) -> str:
     return raw.strip() if raw.strip() else proposed
 
 
-def _ask_category(proposed: str) -> str:
+def _ask_category(categories: list[str], proposed: str) -> str:
     _console.print("  [bold]Catégorie[/bold] :")
-    for i, cat in enumerate(_CATEGORIES, 1):
+    for i, cat in enumerate(categories, 1):
         marker = " [green]←[/green]" if cat == proposed else ""
         _console.print(f"    {i:2}. {cat}{marker}")
-    _console.print(f"  [[cyan]{proposed}[/cyan]] ([dim]s = ignorer[/dim]) : ", end="")
+    _console.print(
+        f"  [[cyan]{proposed}[/cyan]] ([dim]s = ignorer, autre = nouvelle catégorie[/dim]) : ",
+        end="",
+    )
     raw = input().strip()
     if raw.lower() == "s":
         return ""
+    if not raw:
+        return proposed
     if raw.isdigit():
         idx = int(raw) - 1
-        if 0 <= idx < len(_CATEGORIES):
-            return _CATEGORIES[idx]
-    return proposed
+        if 0 <= idx < len(categories):
+            return categories[idx]
+    return raw
 
 
 def _display_transaction(
@@ -62,13 +66,13 @@ def _display_transaction(
     _console.print(table)
 
 
-def enrich(transactions: list[Transaction], cache_path: Path) -> list[Transaction]:
+def enrich(transactions: list[Transaction], config_path: Path) -> list[Transaction]:
     """Interactively enrich transactions with merchant names and categories.
 
     Known transactions (found in cache) are enriched silently.
     Unknown ones trigger an interactive prompt.
     """
-    cache = load_cache(cache_path)
+    config = load_config(config_path)
     enriched: list[Transaction] = []
 
     for tx in transactions:
@@ -77,7 +81,7 @@ def enrich(transactions: list[Transaction], cache_path: Path) -> list[Transactio
             continue
 
         key = cache_key(tx.raw_label)
-        cached = lookup(cache, key)
+        cached = lookup_merchant(config, key)
 
         if cached:
             tx.merchant_name = cached["merchant_name"]
@@ -89,7 +93,7 @@ def enrich(transactions: list[Transaction], cache_path: Path) -> list[Transactio
         api_result = search_company(tx.clean_label)
         if api_result:
             proposed_name = simplify_name(api_result["name"])
-            proposed_category = naf_to_category(api_result["naf"])
+            proposed_category = naf_to_category(api_result["naf"], config["naf_to_category"])
             siren = api_result["siren"]
         else:
             proposed_name = tx.clean_label
@@ -98,13 +102,15 @@ def enrich(transactions: list[Transaction], cache_path: Path) -> list[Transactio
 
         _display_transaction(tx, api_result, proposed_name)
         merchant_name = _ask_merchant_name(proposed_name)
-        category = _ask_category(proposed_category)
+        category = _ask_category(config["categories"], proposed_category)
 
         if category:
+            if category not in config["categories"]:
+                config["categories"].append(category)
             tx.merchant_name = merchant_name
             tx.category = category
-            store(cache, key, merchant_name=merchant_name, category=category, siren=siren)
-            save_cache(cache, cache_path)
+            store_merchant(config, key, merchant_name=merchant_name, category=category, siren=siren)
+            save_config(config, config_path)
 
         enriched.append(tx)
 

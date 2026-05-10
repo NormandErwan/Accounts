@@ -10,24 +10,6 @@ class TransactionType(Enum):
     TRANSFER = "Virement"
 
 
-VALID_CATEGORIES: frozenset[str] = frozenset(
-    {
-        "Logement",
-        "Courses",
-        "Santé",
-        "Transport",
-        "Loisirs",
-        "Maison",
-        "Services",
-        "Abonnements",
-        "Achats",
-        "Impôts",
-        "Épargne",
-        "Revenus",
-        "À classer",
-    }
-)
-
 FIREFLY_TYPE_MAP: dict[TransactionType, str] = {
     TransactionType.EXPENSE: "withdrawal",
     TransactionType.INCOME: "deposit",
@@ -55,5 +37,3 @@ class Transaction:
             raise TypeError(f"type must be TransactionType, got {type(self.type)}")
         if not self.source_account or not self.source_account.strip():
             raise ValueError("source_account must be a non-empty string")
-        if self.category and self.category not in VALID_CATEGORIES:
-            raise ValueError(f"unknown category: {self.category!r}")

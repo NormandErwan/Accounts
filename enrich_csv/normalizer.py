@@ -23,7 +23,6 @@ _CLEAN_INFIXES: list[tuple[str, str]] = [
     (r"(?i)^SumUp\s*\*\s*", ""),
     (r"(?i)^SQ \*\s*", ""),
     (r"(?i)^ADEO\*\s*", ""),
-    (r"(?i)^ANTHROPIC IRELAN\b.*", "Anthropic"),
 ]
 
 _LEGAL_SUFFIXES = re.compile(

@@ -1,6 +1,9 @@
 import pytest
 
+from enrich_csv.defaults import DEFAULT_NAF_TO_CATEGORY
 from enrich_csv.naf import naf_to_category
+
+_NAF_MAP = DEFAULT_NAF_TO_CATEGORY
 
 
 @pytest.mark.parametrize(
@@ -29,4 +32,10 @@ from enrich_csv.naf import naf_to_category
     ],
 )
 def test_naf_to_category(code: str, expected: str):
-    assert naf_to_category(code) == expected
+    assert naf_to_category(code, _NAF_MAP) == expected
+
+
+def test_naf_to_category_custom_map():
+    custom = {"99.99": "Custom"}
+    assert naf_to_category("99.99", custom) == "Custom"
+    assert naf_to_category("47.11", custom) == "À classer"

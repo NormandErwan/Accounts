@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from enrich_csv.models import VALID_CATEGORIES, Transaction, TransactionType
+from enrich_csv.models import Transaction, TransactionType
 
 
 def make_transaction(
@@ -99,17 +99,11 @@ def test_source_account_free_string():
     assert tx.source_account == "Compte Épargne Logement"
 
 
-def test_category_invalid_raises():
-    with pytest.raises(ValueError, match="unknown category"):
-        make_transaction(category="Vacances")
-
-
 def test_category_empty_allowed():
     tx = make_transaction(category="")
     assert tx.category == ""
 
 
-def test_all_valid_categories():
-    for cat in VALID_CATEGORIES:
-        tx = make_transaction(category=cat)
-        assert tx.category == cat
+def test_category_free_string():
+    tx = make_transaction(category="Vacances")
+    assert tx.category == "Vacances"

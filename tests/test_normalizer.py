@@ -24,7 +24,6 @@ class TestNormalizeLabel:
             ("CARTE 12/01 SumUp *ARTISAN NOM", "ARTISAN NOM"),
             ("CARTE 12/01 SumUp  *ARTISAN NOM", "ARTISAN NOM"),
             ("CARTE 03/04 SQ *BOUTIQUE PLACE", "BOUTIQUE PLACE"),
-            ("CARTE 26/03 ANTHROPIC IRELAN DUBLIN", "Anthropic"),
             ("CARTE 02/04 OVH SAS Roubaix", "OVH SAS"),
             ("VIR LBC FRANCE SAS", "FRANCE SAS"),
         ],

@@ -7,7 +7,7 @@ from enrich_csv.models import Transaction
 from enrich_csv.output import to_firefly_csv
 from enrich_csv.parsers import parse_cmb, parse_fortuneo
 
-_DEFAULT_CACHE = Path.home() / ".config" / "expenses" / "cache.json"
+_DEFAULT_CONFIG = Path.home() / ".config" / "expenses" / "config.json"
 
 
 @click.command()
@@ -24,11 +24,12 @@ _DEFAULT_CACHE = Path.home() / ".config" / "expenses" / "cache.json"
     help='Name of the source account (e.g. "CMB Perso", "Fortuneo").',
 )
 @click.option(
-    "--cache",
-    default=_DEFAULT_CACHE,
+    "--config",
+    "config_path",
+    default=_DEFAULT_CONFIG,
     show_default=True,
     type=click.Path(path_type=Path),
-    help="Path to the JSON merchant cache.",
+    help="Path to JSON config file (categories, NAF map, merchant cache).",
 )
 @click.option(
     "--output",
@@ -40,7 +41,7 @@ def main(
     files: tuple[Path, ...],
     bank: str,
     account: str,
-    cache: Path,
+    config_path: Path,
     output: Path | None,
 ) -> None:
     """Enrich bank CSV exports with merchant names and categories for Firefly III import."""
@@ -52,7 +53,7 @@ def main(
             transactions.extend(parse_fortuneo(path, account=account))
 
     transactions.sort(key=lambda tx: tx.date)
-    enriched = enrich(transactions, cache_path=cache)
+    enriched = enrich(transactions, config_path=config_path)
     csv_output = to_firefly_csv(enriched)
 
     if output:
