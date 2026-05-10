@@ -76,6 +76,6 @@ def simplify_name(name: str) -> str:
     return result
 
 
-def cache_key(raw_label: str) -> str:
-    """Return upper-cased normalized label for cache lookup."""
+def destination_key(raw_label: str) -> str:
+    """Return upper-cased normalized label used as the destinations lookup key."""
     return normalize_label(raw_label).upper().strip()

@@ -9,7 +9,7 @@ from enrich_csv.api import search_company
 from enrich_csv.config import load_config, lookup_destination, save_config, store_destination
 from enrich_csv.models import Transaction, TransactionType
 from enrich_csv.naf import naf_to_category
-from enrich_csv.normalizer import cache_key, simplify_name
+from enrich_csv.normalizer import destination_key, simplify_name
 
 _console = Console()
 
@@ -67,10 +67,9 @@ def _display_transaction(
 
 
 def enrich(transactions: list[Transaction], config_path: Path) -> list[Transaction]:
-    """Interactively enrich transactions with merchant names and categories.
+    """Interactively enrich transactions with destination names and categories.
 
-    Known transactions (found in cache) are enriched silently.
-    Unknown ones trigger an interactive prompt.
+    Known transactions are enriched silently; unknown ones trigger an interactive prompt.
     """
     config = load_config(config_path)
     enriched: list[Transaction] = []
@@ -80,12 +79,12 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
             enriched.append(tx)
             continue
 
-        key = cache_key(tx.raw_label)
-        cached = lookup_destination(config, key)
+        key = destination_key(tx.raw_label)
+        entry = lookup_destination(config, key)
 
-        if cached:
-            tx.destination_name = cached["destination_name"]
-            tx.category = cached["category"]
+        if entry:
+            tx.destination_name = entry["destination_name"]
+            tx.category = entry["category"]
             enriched.append(tx)
             continue
 

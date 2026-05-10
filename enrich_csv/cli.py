@@ -29,7 +29,7 @@ _DEFAULT_CONFIG = Path.home() / ".config" / "expenses" / "config.json"
     default=_DEFAULT_CONFIG,
     show_default=True,
     type=click.Path(path_type=Path),
-    help="Path to JSON config file (categories, NAF map, merchant cache).",
+    help="Path to JSON config file (categories, NAF map, destinations).",
 )
 @click.option(
     "--output",
@@ -44,7 +44,7 @@ def main(
     config_path: Path,
     output: Path | None,
 ) -> None:
-    """Enrich bank CSV exports with merchant names and categories for Firefly III import."""
+    """Enrich bank CSV exports with destination names and categories for Firefly III import."""
     transactions: list[Transaction] = []
     for path in files:
         if bank == "cmb":

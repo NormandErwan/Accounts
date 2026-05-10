@@ -30,6 +30,6 @@ Three sections:
 
 - **`categories`** — list of category names shown in the interactive prompt
 - **`naf_to_category`** — mapping from NAF/APE codes (e.g. `"47.11"`) to category names
-- **`destination_cache`** — confirmed destination names and categories, keyed by normalised label
+- **`destinations`** — confirmed destination names and categories, keyed by normalised label
 
 New categories can be added interactively during a session or by editing the file directly.

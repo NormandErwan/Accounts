@@ -66,9 +66,9 @@ class TestSimplifyName:
         assert isinstance(result, str)
 
 
-class TestCacheKey:
-    def test_cache_key_is_upper_stripped(self):
-        from enrich_csv.normalizer import cache_key
+class TestDestinationKey:
+    def test_destination_key_is_upper_stripped(self):
+        from enrich_csv.normalizer import destination_key
 
-        assert cache_key("PRLV Bouygues Telecom") == "BOUYGUES TELECOM"
-        assert cache_key("CARTE 08/01 SUPERMARCHE VILLE") == "SUPERMARCHE VILLE"
+        assert destination_key("PRLV Bouygues Telecom") == "BOUYGUES TELECOM"
+        assert destination_key("CARTE 08/01 SUPERMARCHE VILLE") == "SUPERMARCHE VILLE"

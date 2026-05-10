@@ -23,7 +23,7 @@ def populated_config_path(tmp_path: Path) -> Path:
     data = {
         "categories": ["Logement", "Courses"],
         "naf_to_category": {"47.11": "Courses"},
-        "destination_cache": {
+        "destinations": {
             "OPERATEUR MOBILE": {
                 "destination_name": "Opérateur Mobile",
                 "category": "Abonnements",
@@ -39,14 +39,14 @@ def test_load_config_missing_file_returns_empty_defaults(config_path: Path):
     config = load_config(config_path)
     assert config["categories"] == []
     assert config["naf_to_category"] == {}
-    assert config["destination_cache"] == {}
+    assert config["destinations"] == {}
 
 
 def test_load_config_existing_file_returns_custom_values(populated_config_path: Path):
     config = load_config(populated_config_path)
     assert config["categories"] == ["Logement", "Courses"]
     assert config["naf_to_category"] == {"47.11": "Courses"}
-    assert "OPERATEUR MOBILE" in config["destination_cache"]
+    assert "OPERATEUR MOBILE" in config["destinations"]
 
 
 def test_save_config_creates_valid_json(config_path: Path):
@@ -55,7 +55,7 @@ def test_save_config_creates_valid_json(config_path: Path):
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     assert "categories" in raw
     assert "naf_to_category" in raw
-    assert "destination_cache" in raw
+    assert "destinations" in raw
 
 
 def test_save_config_round_trips(config_path: Path):
@@ -64,7 +64,7 @@ def test_save_config_round_trips(config_path: Path):
     save_config(config, config_path)
     reloaded = load_config(config_path)
     assert lookup_destination(reloaded, "TEST") is not None
-    assert reloaded["destination_cache"]["TEST"]["destination_name"] == "Test"
+    assert reloaded["destinations"]["TEST"]["destination_name"] == "Test"
 
 
 def test_save_config_creates_parent_dirs(tmp_path: Path):
@@ -110,9 +110,9 @@ def test_lookup_destination_case_sensitive(populated_config_path: Path):
 def test_store_destination_adds_entry(config_path: Path):
     config = load_config(config_path)
     store_destination(config, "NOUVEAU", destination_name="Nouveau", category="Achats")
-    assert "NOUVEAU" in config["destination_cache"]
-    assert config["destination_cache"]["NOUVEAU"]["destination_name"] == "Nouveau"
-    assert config["destination_cache"]["NOUVEAU"]["category"] == "Achats"
+    assert "NOUVEAU" in config["destinations"]
+    assert config["destinations"]["NOUVEAU"]["destination_name"] == "Nouveau"
+    assert config["destinations"]["NOUVEAU"]["category"] == "Achats"
 
 
 def test_store_destination_with_siren(config_path: Path):
@@ -120,13 +120,13 @@ def test_store_destination_with_siren(config_path: Path):
     store_destination(
         config, "MARCHAND", destination_name="Marchand", category="Achats", siren="987654321"
     )
-    assert config["destination_cache"]["MARCHAND"]["siren"] == "987654321"
+    assert config["destinations"]["MARCHAND"]["siren"] == "987654321"
 
 
 def test_store_destination_without_siren_defaults_empty(config_path: Path):
     config = load_config(config_path)
     store_destination(config, "MARCHAND", destination_name="Marchand", category="Achats")
-    assert config["destination_cache"]["MARCHAND"]["siren"] == ""
+    assert config["destinations"]["MARCHAND"]["siren"] == ""
 
 
 def test_saved_file_preserves_non_ascii(config_path: Path):
@@ -135,4 +135,4 @@ def test_saved_file_preserves_non_ascii(config_path: Path):
     save_config(config, config_path)
     raw = config_path.read_text(encoding="utf-8")
     parsed = json.loads(raw)
-    assert parsed["destination_cache"]["TEST"]["destination_name"] == "Tëst café"
+    assert parsed["destinations"]["TEST"]["destination_name"] == "Tëst café"

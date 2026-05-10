@@ -6,7 +6,7 @@ from typing import TypedDict
 class Config(TypedDict):
     categories: list[str]
     naf_to_category: dict[str, str]
-    destination_cache: dict[str, dict[str, str]]
+    destinations: dict[str, dict[str, str]]
 
 
 def load_config(path: Path) -> Config:
@@ -15,7 +15,7 @@ def load_config(path: Path) -> Config:
     return Config(
         categories=data.get("categories", []),
         naf_to_category=data.get("naf_to_category", {}),
-        destination_cache=data.get("destination_cache", {}),
+        destinations=data.get("destinations", {}),
     )
 
 
@@ -33,8 +33,8 @@ def add_category(config: Config, name: str, path: Path) -> None:
 
 
 def lookup_destination(config: Config, key: str) -> dict[str, str] | None:
-    """Return the cached destination entry for key, or None if absent."""
-    return config["destination_cache"].get(key)
+    """Return the destination entry for key, or None if absent."""
+    return config["destinations"].get(key)
 
 
 def store_destination(
@@ -46,7 +46,7 @@ def store_destination(
     siren: str = "",
 ) -> None:
     """Insert or update a destination entry in the in-memory config."""
-    config["destination_cache"][key] = {
+    config["destinations"][key] = {
         "destination_name": destination_name,
         "category": category,
         "siren": siren,
