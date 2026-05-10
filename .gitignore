@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+cache.json
+*.csv
+*.zip
+!tests/fixtures/*.csv
+!tests/fixtures/*.zip
