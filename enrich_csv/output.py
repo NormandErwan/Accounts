@@ -23,7 +23,7 @@ def _to_row(tx: Transaction) -> _FireflyRow:
         amount=f"{tx.amount:.2f}",
         currency_code="EUR",
         source_name=tx.source_name,
-        destination_name=tx.destination_name if tx.type == TransactionType.WITHDRAWAL else "",
+        destination_name=tx.destination_name if tx.type == TransactionType.EXPENSE else "",
         category=tx.category,
         type=tx.type.value,
     )

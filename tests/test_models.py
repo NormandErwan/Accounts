@@ -13,7 +13,7 @@ def make_transaction(
     raw_label: str = "PRLV OPERATEUR MOBILE",
     clean_label: str = "OPERATEUR MOBILE",
     amount: Decimal = Decimal("9.99"),
-    type: TransactionType = TransactionType.WITHDRAWAL,
+    type: TransactionType = TransactionType.EXPENSE,
     source_name: str = "CMB Perso",
     destination_name: str = "",
     category: str = "",
@@ -33,7 +33,7 @@ def make_transaction(
 def test_valid_transaction():
     tx = make_transaction()
     assert tx.amount == Decimal("9.99")
-    assert tx.type == TransactionType.WITHDRAWAL
+    assert tx.type == TransactionType.EXPENSE
     assert tx.destination_name == ""
     assert tx.category == ""
 
@@ -51,8 +51,8 @@ def test_all_transaction_types():
 
 
 def test_transaction_type_firefly_values():
-    assert TransactionType.WITHDRAWAL.value == "withdrawal"
-    assert TransactionType.DEPOSIT.value == "deposit"
+    assert TransactionType.EXPENSE.value == "withdrawal"
+    assert TransactionType.INCOME.value == "deposit"
     assert TransactionType.TRANSFER.value == "transfer"
 
 
