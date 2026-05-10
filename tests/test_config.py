@@ -26,7 +26,7 @@ def populated_config_path(tmp_path: Path) -> Path:
         "naf_to_category": {"47.11": "Courses"},
         "merchant_cache": {
             "OPERATEUR MOBILE": {
-                "merchant_name": "Opérateur Mobile",
+                "destination_name": "Opérateur Mobile",
                 "category": "Abonnements",
                 "siren": "123456789",
             }
@@ -61,11 +61,11 @@ def test_save_config_creates_valid_json(config_path: Path):
 
 def test_save_config_round_trips(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "TEST", merchant_name="Test", category="Services")
+    store_merchant(config, "TEST", destination_name="Test", category="Services")
     save_config(config, config_path)
     reloaded = load_config(config_path)
     assert lookup_merchant(reloaded, "TEST") is not None
-    assert reloaded["merchant_cache"]["TEST"]["merchant_name"] == "Test"
+    assert reloaded["merchant_cache"]["TEST"]["destination_name"] == "Test"
 
 
 def test_save_config_creates_parent_dirs(tmp_path: Path):
@@ -94,7 +94,7 @@ def test_lookup_merchant_existing_key(populated_config_path: Path):
     config = load_config(populated_config_path)
     result = lookup_merchant(config, "OPERATEUR MOBILE")
     assert result is not None
-    assert result["merchant_name"] == "Opérateur Mobile"
+    assert result["destination_name"] == "Opérateur Mobile"
     assert result["category"] == "Abonnements"
 
 
@@ -110,30 +110,32 @@ def test_lookup_merchant_case_sensitive(populated_config_path: Path):
 
 def test_store_merchant_adds_entry(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "NOUVEAU MARCHAND", merchant_name="Nouveau Marchand", category="Achats")
+    store_merchant(
+        config, "NOUVEAU MARCHAND", destination_name="Nouveau Marchand", category="Achats"
+    )
     assert "NOUVEAU MARCHAND" in config["merchant_cache"]
-    assert config["merchant_cache"]["NOUVEAU MARCHAND"]["merchant_name"] == "Nouveau Marchand"
+    assert config["merchant_cache"]["NOUVEAU MARCHAND"]["destination_name"] == "Nouveau Marchand"
     assert config["merchant_cache"]["NOUVEAU MARCHAND"]["category"] == "Achats"
 
 
 def test_store_merchant_with_siren(config_path: Path):
     config = load_config(config_path)
     store_merchant(
-        config, "MARCHAND", merchant_name="Marchand", category="Achats", siren="987654321"
+        config, "MARCHAND", destination_name="Marchand", category="Achats", siren="987654321"
     )
     assert config["merchant_cache"]["MARCHAND"]["siren"] == "987654321"
 
 
 def test_store_merchant_without_siren_defaults_empty(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "MARCHAND", merchant_name="Marchand", category="Achats")
+    store_merchant(config, "MARCHAND", destination_name="Marchand", category="Achats")
     assert config["merchant_cache"]["MARCHAND"]["siren"] == ""
 
 
 def test_saved_file_preserves_non_ascii(config_path: Path):
     config = load_config(config_path)
-    store_merchant(config, "TEST", merchant_name="Tëst café", category="Loisirs")
+    store_merchant(config, "TEST", destination_name="Tëst café", category="Loisirs")
     save_config(config, config_path)
     raw = config_path.read_text(encoding="utf-8")
     parsed = json.loads(raw)
-    assert parsed["merchant_cache"]["TEST"]["merchant_name"] == "Tëst café"
+    assert parsed["merchant_cache"]["TEST"]["destination_name"] == "Tëst café"

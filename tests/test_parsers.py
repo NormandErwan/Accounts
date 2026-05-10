@@ -13,9 +13,9 @@ class TestParseCmb:
         txs = parse_cmb(FIXTURES / "cmb_perso_sample.csv", account="CMB Perso")
         assert len(txs) == 5
 
-    def test_source_account_matches_argument(self):
+    def test_source_name_matches_argument(self):
         txs = parse_cmb(FIXTURES / "cmb_perso_sample.csv", account="Mon Compte")
-        assert all(tx.source_account == "Mon Compte" for tx in txs)
+        assert all(tx.source_name == "Mon Compte" for tx in txs)
 
     def test_debit_row_is_expense(self):
         txs = parse_cmb(FIXTURES / "cmb_perso_sample.csv", account="CMB Perso")
@@ -101,9 +101,9 @@ class TestParseFortuneoFromCsv:
         txs = parse_fortuneo(FIXTURES / "fortuneo_sample.csv", account="Fortuneo")
         assert all(isinstance(tx.date, date) for tx in txs)
 
-    def test_source_account_matches_argument(self):
+    def test_source_name_matches_argument(self):
         txs = parse_fortuneo(FIXTURES / "fortuneo_sample.csv", account="Fortuneo")
-        assert all(tx.source_account == "Fortuneo" for tx in txs)
+        assert all(tx.source_name == "Fortuneo" for tx in txs)
 
 
 class TestParseFortuneoFromZip:

@@ -49,7 +49,7 @@ def parse_cmb(path: Path, account: str) -> list[Transaction]:
                     clean_label=normalize_label(label),
                     amount=amount,
                     type=tx_type,
-                    source_account=account,
+                    source_name=account,
                 )
             )
     return transactions
@@ -101,7 +101,7 @@ def parse_fortuneo(path: Path, account: str) -> list[Transaction]:
                 clean_label=normalize_label(label),
                 amount=amount,
                 type=tx_type,
-                source_account=account,
+                source_name=account,
             )
         )
     return transactions

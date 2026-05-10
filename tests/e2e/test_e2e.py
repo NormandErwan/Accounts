@@ -36,7 +36,7 @@ def _assert_transactions_valid(transactions: list[Transaction]) -> None:
     for tx in transactions:
         assert isinstance(tx.amount, Decimal)
         assert tx.amount >= 0
-        assert tx.source_account
+        assert tx.source_name
         assert tx.raw_label
 
 

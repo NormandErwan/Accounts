@@ -25,8 +25,8 @@ def make_transaction(
     clean_label: str = "OPERATEUR MOBILE",
     amount: Decimal = Decimal("9.99"),
     type: TransactionType = TransactionType.EXPENSE,
-    source_account: str = "CMB Perso",
-    merchant_name: str = "Opérateur Mobile",
+    source_name: str = "CMB Perso",
+    destination_name: str = "Opérateur Mobile",
     category: str = "Abonnements",
 ) -> Transaction:
     return Transaction(
@@ -35,8 +35,8 @@ def make_transaction(
         clean_label=clean_label,
         amount=amount,
         type=type,
-        source_account=source_account,
-        merchant_name=merchant_name,
+        source_name=source_name,
+        destination_name=destination_name,
         category=category,
     )
 
@@ -83,13 +83,15 @@ def test_currency_is_eur():
 
 
 def test_source_name_is_account():
-    rows = parse_csv(to_firefly_csv([make_transaction(source_account="CMB Perso")]))
+    rows = parse_csv(to_firefly_csv([make_transaction(source_name="CMB Perso")]))
     assert rows[0]["source_name"] == "CMB Perso"
 
 
 def test_destination_name_for_expense():
     rows = parse_csv(
-        to_firefly_csv([make_transaction(type=TransactionType.EXPENSE, merchant_name="Carrefour")])
+        to_firefly_csv(
+            [make_transaction(type=TransactionType.EXPENSE, destination_name="Carrefour")]
+        )
     )
     assert rows[0]["destination_name"] == "Carrefour"
 
@@ -121,7 +123,9 @@ def test_multiple_transactions():
 
 
 def test_output_is_utf8_encoded():
-    result = to_firefly_csv([make_transaction(merchant_name="Café de la Paix", category="Loisirs")])
+    result = to_firefly_csv(
+        [make_transaction(destination_name="Café de la Paix", category="Loisirs")]
+    )
     assert "Café de la Paix" in result
 
 

@@ -43,13 +43,13 @@ def store_merchant(
     config: Config,
     key: str,
     *,
-    merchant_name: str,
+    destination_name: str,
     category: str,
     siren: str = "",
 ) -> None:
     """Insert or update a merchant entry in the in-memory config."""
     config["merchant_cache"][key] = {
-        "merchant_name": merchant_name,
+        "destination_name": destination_name,
         "category": category,
         "siren": siren,
     }

@@ -24,8 +24,8 @@ class Transaction:
     clean_label: str
     amount: Decimal
     type: TransactionType
-    source_account: str
-    merchant_name: str = ""
+    source_name: str
+    destination_name: str = ""
     category: str = ""
 
     def __post_init__(self) -> None:
@@ -35,5 +35,5 @@ class Transaction:
             raise ValueError(f"amount must be a positive Decimal, got {self.amount!r}")
         if not isinstance(self.type, TransactionType):
             raise TypeError(f"type must be TransactionType, got {type(self.type)}")
-        if not self.source_account or not self.source_account.strip():
-            raise ValueError("source_account must be a non-empty string")
+        if not self.source_name or not self.source_name.strip():
+            raise ValueError("source_name must be a non-empty string")

@@ -21,7 +21,7 @@ def _format_date(tx: Transaction) -> str:
     return tx.date.strftime("%A %d %B %Y")
 
 
-def _ask_merchant_name(proposed: str) -> str:
+def _ask_destination_name(proposed: str) -> str:
     _console.print(f"  [bold]Nom commercial[/bold] [[cyan]{proposed}[/cyan]] : ", end="")
     raw = input()
     return raw.strip() if raw.strip() else proposed
@@ -62,7 +62,7 @@ def _display_transaction(
     else:
         api_info = "[dim](aucun résultat SIRENE)[/dim]"
     table.add_row("API SIRENE", api_info)
-    _console.rule(f"[bold]{tx.type.value}[/bold] — {tx.source_account}")
+    _console.rule(f"[bold]{tx.type.value}[/bold] — {tx.source_name}")
     _console.print(table)
 
 
@@ -84,7 +84,7 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
         cached = lookup_merchant(config, key)
 
         if cached:
-            tx.merchant_name = cached["merchant_name"]
+            tx.destination_name = cached["destination_name"]
             tx.category = cached["category"]
             enriched.append(tx)
             continue
@@ -101,15 +101,17 @@ def enrich(transactions: list[Transaction], config_path: Path) -> list[Transacti
             siren = ""
 
         _display_transaction(tx, api_result, proposed_name)
-        merchant_name = _ask_merchant_name(proposed_name)
+        destination_name = _ask_destination_name(proposed_name)
         category = _ask_category(config["categories"], proposed_category)
 
         if category:
             if category not in config["categories"]:
                 config["categories"].append(category)
-            tx.merchant_name = merchant_name
+            tx.destination_name = destination_name
             tx.category = category
-            store_merchant(config, key, merchant_name=merchant_name, category=category, siren=siren)
+            store_merchant(
+                config, key, destination_name=destination_name, category=category, siren=siren
+            )
             save_config(config, config_path)
 
         enriched.append(tx)

@@ -14,8 +14,8 @@ def make_transaction(
     clean_label: str = "OPERATEUR MOBILE",
     amount: Decimal = Decimal("9.99"),
     type: TransactionType = TransactionType.EXPENSE,
-    source_account: str = "CMB Perso",
-    merchant_name: str = "",
+    source_name: str = "CMB Perso",
+    destination_name: str = "",
     category: str = "",
 ) -> Transaction:
     return Transaction(
@@ -24,8 +24,8 @@ def make_transaction(
         clean_label=clean_label,
         amount=amount,
         type=type,
-        source_account=source_account,
-        merchant_name=merchant_name,
+        source_name=source_name,
+        destination_name=destination_name,
         category=category,
     )
 
@@ -34,13 +34,13 @@ def test_valid_transaction():
     tx = make_transaction()
     assert tx.amount == Decimal("9.99")
     assert tx.type == TransactionType.EXPENSE
-    assert tx.merchant_name == ""
+    assert tx.destination_name == ""
     assert tx.category == ""
 
 
 def test_valid_transaction_with_category():
-    tx = make_transaction(merchant_name="Opérateur Mobile", category="Abonnements")
-    assert tx.merchant_name == "Opérateur Mobile"
+    tx = make_transaction(destination_name="Opérateur Mobile", category="Abonnements")
+    assert tx.destination_name == "Opérateur Mobile"
     assert tx.category == "Abonnements"
 
 
@@ -84,19 +84,19 @@ def test_date_string_raises():
         make_transaction(date=bad)
 
 
-def test_source_account_empty_raises():
+def test_source_name_empty_raises():
     with pytest.raises(ValueError, match="non-empty"):
-        make_transaction(source_account="")
+        make_transaction(source_name="")
 
 
-def test_source_account_whitespace_raises():
+def test_source_name_whitespace_raises():
     with pytest.raises(ValueError, match="non-empty"):
-        make_transaction(source_account="   ")
+        make_transaction(source_name="   ")
 
 
-def test_source_account_free_string():
-    tx = make_transaction(source_account="Compte Épargne Logement")
-    assert tx.source_account == "Compte Épargne Logement"
+def test_source_name_free_string():
+    tx = make_transaction(source_name="Compte Épargne Logement")
+    assert tx.source_name == "Compte Épargne Logement"
 
 
 def test_category_empty_allowed():
