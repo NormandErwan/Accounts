@@ -54,17 +54,17 @@ def test_headers():
 
 def test_expense_type_maps_to_withdrawal():
     rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.EXPENSE)]))
-    assert rows[0]["type"] == "withdrawal"
+    assert rows[0]["type"] == TransactionType.EXPENSE.value
 
 
 def test_income_type_maps_to_deposit():
     rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.INCOME)]))
-    assert rows[0]["type"] == "deposit"
+    assert rows[0]["type"] == TransactionType.INCOME.value
 
 
 def test_transfer_type_maps_to_transfer():
     rows = parse_csv(to_firefly_csv([make_transaction(type=TransactionType.TRANSFER)]))
-    assert rows[0]["type"] == "transfer"
+    assert rows[0]["type"] == TransactionType.TRANSFER.value
 
 
 def test_date_is_iso_format():
