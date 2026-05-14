@@ -4,32 +4,29 @@ CLI tool that enriches French bank CSV exports (CMB, Fortuneo) with destination 
 
 ## Installation
 
-Requires [uv](https://docs.astral.sh/uv/).
+Requires [.NET 10](https://dotnet.microsoft.com/).
 
 ```bash
-uv sync
-uv run enrich-csv --help
+dotnet build
 ```
 
 ## Usage
 
 ```bash
-uv run enrich-csv RELEVE_COMPTE.csv --bank cmb --account "CMB Perso"
-uv run enrich-csv HistoriqueOperations_12345678.zip --bank fortuneo --account "Fortuneo"
-uv run enrich-csv jan.csv feb.csv --bank cmb --account "CMB Perso" --output firefly.csv
-uv run enrich-csv RELEVE.csv --bank cmb --account "CMB Perso" --config ~/my-config.json
+dotnet run --project src/EnrichCsv -- RELEVE_COMPTE.csv --bank cmb --account "CMB Perso"
+dotnet run --project src/EnrichCsv -- HistoriqueOperations_12345678.zip --bank fortuneo --account "Fortuneo"
+dotnet run --project src/EnrichCsv -- jan.csv feb.csv --bank cmb --account "CMB Perso" --output firefly.csv
 ```
+
+Bank format is auto-detected from the file header; use `--bank` only when detection is ambiguous.
 
 For each unknown transaction the tool queries the [SIRENE API](https://recherche-entreprises.api.gouv.fr) and prompts to confirm the destination name and category.
 
-## Config file
+## Cache file
 
-Default location: `~/.config/expenses/config.json`. Created automatically on first run (empty — add your own categories and NAF mappings).
+Default location: `./cache.json` (next to the bank exports). Created automatically on first run.
 
-Three sections:
+Two sections:
 
-- **`categories`** — list of category names shown in the interactive prompt
-- **`naf_to_category`** — mapping from NAF/APE codes (e.g. `"47.11"`) to category names
-- **`destinations`** — confirmed destination names and categories, keyed by normalised label
-
-New categories can be added interactively during a session or by editing the file directly.
+- **`naf_to_category`** — mapping from NAF/APE codes (e.g. `"47.11"`) to category names; edit by hand
+- **`destinations`** — confirmed destination names and categories, keyed by normalised label; written by the tool
