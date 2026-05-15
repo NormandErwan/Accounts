@@ -10,3 +10,5 @@ cache.json
 *.zip
 !tests/EnrichCsv.Tests/Fixtures/*.csv
 !tests/EnrichCsv.Tests/Fixtures/*.zip
+.agents/
+skills-lock.json
